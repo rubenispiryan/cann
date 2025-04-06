@@ -1,4 +1,8 @@
 #include <stddef.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <memory.h>
+
 #include "matrix.h"
 
 typedef struct matrix {
@@ -27,4 +31,36 @@ void destroy_matrix(Matrix *m) {
     assert(m);
     free(m->data);
     free(m);
+}
+
+void matrix_set_data(Matrix *m, float *data) {
+    assert(m);
+    assert(data);
+    memcpy(m->data, data, sizeof(float) * m->n_cols * m->n_rows);
+}
+
+void matrix_vec_mul(Matrix *m, Vector *v, Vector *res) {
+    assert(m);
+    assert(v);
+    assert(res);
+
+    assert(v != res);
+    assert(m->n_cols == vector_get_n(v));
+    assert(m->n_rows == vector_get_n(res));
+    assert(vector_get_is_column(v));
+    assert(vector_get_is_column(res));
+
+    const float *data = vector_get_data(v);
+    float *res_data = malloc(sizeof(float) * vector_get_n(res));
+    if (res_data == NULL) {
+        return;
+    }
+    for (int i = 0; i < m->n_rows; i++) {
+        int total = 0;
+        for (int j = 0; j < m->n_cols; j++) {
+            total += m->data[i * m->n_cols + j] * data[j];
+        }
+        res_data[i] = total;
+    }
+    vector_set_data(res, res_data);
 }

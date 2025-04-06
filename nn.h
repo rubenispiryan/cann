@@ -4,7 +4,7 @@
 typedef struct layer Layer;
 typedef struct network Network;
 
-struct layer *create_layer(int n_input, int n_output);
+Layer *create_layer(int n_input, int n_output);
 
 void destroy_layer(Layer *l);
 

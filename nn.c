@@ -1,4 +1,6 @@
 #include <stddef.h>
+#include <assert.h>
+#include <stdlib.h>
 
 #include "nn.h"
 #include "matrix.h"
