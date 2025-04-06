@@ -10,6 +10,7 @@ typedef struct layer {
     Matrix *weights;
     Vector *output;
     int n;
+    void (*activation) (Vector *);
 } Layer;
 
 typedef struct network {
@@ -36,6 +37,7 @@ Layer *create_layer(int n_input, int n_output) {
     l->n = n_output;
     l->weights = weights;
     l->output = output;
+    l->activation = NULL;
     return l;
 }
 
@@ -79,6 +81,10 @@ static void layer_apply(Layer *l, const Vector *input) {
     assert(l);
     assert(input);
     matrix_vec_mul(l->weights, input, l->output);
+    if (l->activation == NULL) {
+        return;
+    }
+    l->activation(l->output);
 }
 
 int net_get_n_output(const Network *net) {
@@ -100,6 +106,12 @@ void layer_set_weights(const Layer *l, const Matrix *new_weights) {
     assert(l);
     assert(new_weights);
     matrix_copy(l->weights, new_weights);
+}
+
+void layer_set_activation(Layer *l, void (*func) (Vector *)) {
+    assert(l);
+    assert(func);
+    l->activation = func;
 }
 
 void layer_initialize_weights(const Layer *l, double (*const method) (int, int)) {

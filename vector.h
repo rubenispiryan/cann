@@ -19,6 +19,8 @@ void vector_transpose(Vector *v);
 
 void vector_set_data(Vector *v, const double *data, int n_elem);
 
+void vector_map_data(Vector *v, double (*func) (double));
+
 void vector_print(const Vector *v);
 
 #endif
