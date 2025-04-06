@@ -9,7 +9,9 @@ Matrix *create_matrix(int n_rows, int n_cols);
 
 void destroy_matrix(Matrix *m);
 
-void matrix_set_data(Matrix *m, float *data);
+int matrix_get_n_elem(Matrix *m);
+
+void matrix_set_data(Matrix *m, float *data, int n_elem);
 
 void matrix_vec_mul(Matrix *m, Vector *v, Vector *res);
 

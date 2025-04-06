@@ -49,8 +49,9 @@ bool vector_get_is_column(Vector *v) {
     return v->is_column;
 }
 
-void vector_set_data(Vector *v, float *data) {
+void vector_set_data(Vector *v, const float *data, int n_elem) {
     assert(v);
     assert(data);
-    memcpy(v->data, data, sizeof(float) * v->n);
+    assert(n_elem <= v->n);
+    memcpy(v->data, data, sizeof(float) * n_elem);
 }

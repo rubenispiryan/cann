@@ -15,6 +15,6 @@ const float *vector_get_data(Vector *v);
 
 bool vector_get_is_column(Vector *v);
 
-void vector_set_data(Vector *v, float *data);
+void vector_set_data(Vector *v, const float *data, int n_elem);
 
 #endif

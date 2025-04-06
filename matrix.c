@@ -33,10 +33,16 @@ void destroy_matrix(Matrix *m) {
     free(m);
 }
 
-void matrix_set_data(Matrix *m, float *data) {
+int matrix_get_n_elem(Matrix *m) {
+    assert(m);
+    return m->n_cols * m->n_rows;
+}
+
+void matrix_set_data(Matrix *m, float *data, int n_elem) {
     assert(m);
     assert(data);
-    memcpy(m->data, data, sizeof(float) * m->n_cols * m->n_rows);
+    assert(n_elem <= m->n_cols * m->n_rows);
+    memcpy(m->data, data, sizeof(float) * n_elem);
 }
 
 void matrix_vec_mul(Matrix *m, Vector *v, Vector *res) {
@@ -62,5 +68,5 @@ void matrix_vec_mul(Matrix *m, Vector *v, Vector *res) {
         }
         res_data[i] = total;
     }
-    vector_set_data(res, res_data);
+    vector_set_data(res, res_data, vector_get_n(res));
 }
