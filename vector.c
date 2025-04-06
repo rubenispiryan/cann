@@ -3,11 +3,12 @@
 #include <assert.h>
 #include <memory.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "vector.h"
 
 typedef struct vector {
-    float *data;
+    double *data;
     int n;
     bool is_column;
 } Vector;
@@ -17,7 +18,7 @@ Vector *create_vector(int n, bool is_column) {
     if (v == NULL) {
         return NULL;
     }
-    float *data = malloc(sizeof(float) * n);
+    double *data = malloc(sizeof(double) * n);
     if (data == NULL) {
         free(v);
         return NULL;
@@ -34,24 +35,42 @@ void destroy_vector(Vector *v) {
     free(v);
 }
 
-int vector_get_n(Vector *v) {
+int vector_get_n(const Vector *v) {
     assert(v);
     return v->n;
 }
 
-const float *vector_get_data(Vector *v) {
+const double *vector_get_data(const Vector *v) {
     assert(v);
     return v->data;
 }
 
-bool vector_get_is_column(Vector *v) {
+bool vector_get_is_column(const Vector *v) {
     assert(v);
     return v->is_column;
 }
 
-void vector_set_data(Vector *v, const float *data, int n_elem) {
+void vector_transpose(Vector *v) {
+    assert(v);
+    v->is_column = !v->is_column;
+}
+
+void vector_set_data(Vector *v, const double *data, int n_elem) {
     assert(v);
     assert(data);
     assert(n_elem <= v->n);
-    memcpy(v->data, data, sizeof(float) * n_elem);
+    memcpy(v->data, data, sizeof(double) * n_elem);
+}
+
+void vector_print(const Vector *v) {
+    assert(v);
+    for (int i = 0; i < v->n; i++) {
+        if (i > 0 && v->is_column) {
+            printf("\n");
+        } else if (i > 0) {
+            printf(" ");
+        }
+        printf("%.2f", v->data[i]);
+    }
+    printf("\n");
 }

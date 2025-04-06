@@ -2,6 +2,7 @@
 #define _NN_HEADER_
 
 #include "vector.h"
+#include "matrix.h"
 
 typedef struct layer Layer;
 typedef struct network Network;
@@ -14,14 +15,18 @@ Network *create_network(int n_layers);
 
 void destroy_network(Network *net);
 
-int net_get_n_output(Network *net);
+int net_get_n_output(const Network *net);
 
-int layer_get_n_weights(Layer *l);
+int layer_get_n_weights(const Layer *l);
 
-void layer_set_weights(Layer *l, float *weights, int n_elem);
+const Matrix *layer_get_weights(const Layer *l);
+
+void layer_set_weights(const Layer *l, const Matrix *new_weights);
+
+void layer_initialize_weights(const Layer *l, double (*const method) (int, int));
 
 void net_set_layer(Network *net, Layer *l, int index);
 
-void net_feed_forward(Network *net, Vector *input, Vector *output);
+void net_feed_forward(const Network *net, const Vector *input, Vector *output);
 
 #endif

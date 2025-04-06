@@ -75,26 +75,37 @@ void destroy_network(Network *net) {
     free(net);
 }
 
-static void layer_apply(Layer *l, Vector *input) {
+static void layer_apply(Layer *l, const Vector *input) {
     assert(l);
     assert(input);
     matrix_vec_mul(l->weights, input, l->output);
 }
 
-int net_get_n_output(Network *net) {
+int net_get_n_output(const Network *net) {
     assert(net);
     return net->layers[net->n_layers - 1]->n;
 }
 
-int layer_get_n_weights(Layer *l) {
+int layer_get_n_weights(const Layer *l) {
     assert(l);
     return matrix_get_n_elem(l->weights);
 }
 
-void layer_set_weights(Layer *l, float *weights, int n_elem) {
+const Matrix *layer_get_weights(const Layer *l) {
     assert(l);
-    assert(weights);
-    matrix_set_data(l->weights, weights, n_elem);
+    return l->weights;
+}
+
+void layer_set_weights(const Layer *l, const Matrix *new_weights) {
+    assert(l);
+    assert(new_weights);
+    matrix_copy(l->weights, new_weights);
+}
+
+void layer_initialize_weights(const Layer *l, double (*const method) (int, int)) {
+    assert(l);
+    assert(method);
+    matrix_initialize(l->weights, method);
 }
 
 void net_set_layer(Network *net, Layer *l, int index) {
@@ -105,7 +116,7 @@ void net_set_layer(Network *net, Layer *l, int index) {
     net->layers[index] = l;
 }
 
-void net_feed_forward(Network *net, Vector *input, Vector *output) {
+void net_feed_forward(const Network *net, const Vector *input, Vector *output) {
     assert(net);
     assert(input);
     assert(output);

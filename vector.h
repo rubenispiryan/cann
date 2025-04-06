@@ -9,12 +9,16 @@ Vector *create_vector(int n, bool is_column);
 
 void destroy_vector(Vector *v);
 
-int vector_get_n(Vector *v);
+int vector_get_n(const Vector *v);
 
-const float *vector_get_data(Vector *v);
+const double *vector_get_data(const Vector *v);
 
-bool vector_get_is_column(Vector *v);
+bool vector_get_is_column(const Vector *v);
 
-void vector_set_data(Vector *v, const float *data, int n_elem);
+void vector_transpose(Vector *v);
+
+void vector_set_data(Vector *v, const double *data, int n_elem);
+
+void vector_print(const Vector *v);
 
 #endif

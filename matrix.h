@@ -9,10 +9,16 @@ Matrix *create_matrix(int n_rows, int n_cols);
 
 void destroy_matrix(Matrix *m);
 
-int matrix_get_n_elem(Matrix *m);
+int matrix_get_n_elem(const Matrix *m);
 
-void matrix_set_data(Matrix *m, float *data, int n_elem);
+void matrix_copy(Matrix *dst_m, const Matrix *src_m);
 
-void matrix_vec_mul(Matrix *m, Vector *v, Vector *res);
+void matrix_vec_mul(const Matrix *m, const Vector *v, Vector *res);
+
+Matrix *matrix_make_from_k(int k, int n_rows, int n_cols);
+
+void matrix_initialize(Matrix *m, double (*const method) (int, int));
+
+void matrix_print(const Matrix *m);
 
 #endif
