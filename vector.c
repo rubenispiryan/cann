@@ -62,11 +62,12 @@ void vector_set_data(Vector *v, const double *data, int n_elem) {
     memcpy(v->data, data, sizeof(double) * n_elem);
 }
 
-void vector_map_data(Vector *v, double (*const func) (double)) {
+void vector_map_data(Vector *v, double (*const func) (double, double),
+                     double second) {
     assert(v);
     assert(func);
     for (int i = 0; i < v->n; i++) {
-        v->data[i] = func(v->data[i]);
+        v->data[i] = func(v->data[i], second);
     }
 }
 

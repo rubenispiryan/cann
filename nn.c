@@ -92,11 +92,10 @@ static void layer_apply(Layer *l, const Vector *input) {
     assert(l);
     assert(input);
     matrix_vec_mul(l->weights, input, l->output);
-    if (l->activation == NULL) {
-        return;
-    }
     vector_add(l->output, l->bias, l->output);
-    l->activation(l->output);
+    if (l->activation) {
+        l->activation(l->output);
+    }
 }
 
 int net_get_n_output(const Network *net) {

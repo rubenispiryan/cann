@@ -9,4 +9,6 @@ void activation_sigmoid(Vector *input);
 
 void activation_tanh(Vector *input);
 
+void activation_softmax(Vector *input);
+
 #endif
