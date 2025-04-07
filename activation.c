@@ -4,6 +4,7 @@
 #include "activation.h"
 #include "vector.h"
 
+// TODO: add derivatives for backprop
 static double relu(double input) {
     return input > 0 ? input : 0;
 }

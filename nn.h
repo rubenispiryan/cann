@@ -27,6 +27,10 @@ void layer_set_activation(Layer *l, void (*func) (Vector *));
 
 void layer_initialize_weights(const Layer *l, double (*const method) (int, int));
 
+void layer_initialize_bias(const Layer *l);
+
+void layer_initialize(const Layer *l, double (*const method) (int, int));
+
 void net_set_layer(Network *net, Layer *l, int index);
 
 void net_feed_forward(const Network *net, const Vector *input, Vector *output);

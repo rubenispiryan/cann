@@ -6,8 +6,10 @@
 #include "nn.h"
 #include "matrix.h"
 
+// TODO: add backprop
 typedef struct layer {
     Matrix *weights;
+    Vector *bias;
     Vector *output;
     int n;
     void (*activation) (Vector *);
@@ -23,19 +25,27 @@ Layer *create_layer(int n_input, int n_output) {
     if (weights == NULL) {
         return NULL;
     }
+    Vector *bias = create_vector(n_output, true);
+    if (bias == NULL) {
+        destroy_matrix(weights);
+        return NULL;
+    }
     Vector *output = create_vector(n_output, true);
     if (output == NULL) {
         destroy_matrix(weights);
+        destroy_vector(bias);
         return NULL;
     }
     Layer *l = malloc(sizeof(Layer));
     if (l == NULL) {
         destroy_matrix(weights);
+        destroy_vector(bias);
         destroy_vector(output);
         return NULL;
     }
     l->n = n_output;
     l->weights = weights;
+    l->bias = bias;
     l->output = output;
     l->activation = NULL;
     return l;
@@ -44,6 +54,7 @@ Layer *create_layer(int n_input, int n_output) {
 void destroy_layer(Layer *l) {
     assert(l);
     destroy_matrix(l->weights);
+    destroy_vector(l->bias);
     destroy_vector(l->output);
     free(l);
 }
@@ -84,6 +95,7 @@ static void layer_apply(Layer *l, const Vector *input) {
     if (l->activation == NULL) {
         return;
     }
+    vector_add(l->output, l->bias, l->output);
     l->activation(l->output);
 }
 
@@ -114,10 +126,26 @@ void layer_set_activation(Layer *l, void (*func) (Vector *)) {
     l->activation = func;
 }
 
-void layer_initialize_weights(const Layer *l, double (*const method) (int, int)) {
+void layer_initialize_weights(const Layer *l,
+                              double (*const method) (int, int)) {
     assert(l);
     assert(method);
     matrix_initialize(l->weights, method);
+}
+
+static double zero_initializator(int n) {
+    return 0;
+}
+
+void layer_initialize_bias(const Layer *l) {
+    assert(l);
+    vector_initialize(l->bias, &zero_initializator);
+}
+
+void layer_initialize(const Layer *l, double (*const method) (int, int)) {
+    assert(l);
+    layer_initialize_weights(l, method);
+    layer_initialize_bias(l);
 }
 
 void net_set_layer(Network *net, Layer *l, int index) {
