@@ -1,16 +1,21 @@
 #include <math.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <assert.h> 
 
 #include "rand_distr.h"
 
-static double rand_uniform(double left, double right) {
+int rand_int(int a, int b) {
+    assert(a <= b);
+    return a + rand() % (b - a + 1);
+}
+
+double rand_uniform(double left, double right) {
     assert(left <= right);
     double uniform_number = rand();
     return (right - left) * (uniform_number / (double) RAND_MAX) + left;
 }
 
-static double rand_normal(double mean, double std) {
+double rand_normal(double mean, double std) {
     double u1 = rand() / (double) RAND_MAX;
     double u2 = rand() / (double) RAND_MAX;
     double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);

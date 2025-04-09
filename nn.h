@@ -3,6 +3,8 @@
 
 #include "vector.h"
 #include "matrix.h"
+#include "loss.h"
+#include "activation.h"
 
 typedef struct layer Layer;
 typedef struct network Network;
@@ -11,7 +13,7 @@ Layer *create_layer(int n_input, int n_output);
 
 void destroy_layer(Layer *l);
 
-Network *create_network(int n_layers);
+Network *create_network(int n_layers, double lr);
 
 void destroy_network(Network *net);
 
@@ -23,7 +25,9 @@ const Matrix *layer_get_weights(const Layer *l);
 
 void layer_set_weights(const Layer *l, const Matrix *new_weights);
 
-void layer_set_activation(Layer *l, void (*func) (Vector *));
+void layer_set_activation(Layer *l, Activation *act);
+
+void net_set_loss(Network *net, Loss *loss);
 
 void layer_initialize_weights(const Layer *l, double (*const method) (int, int));
 
@@ -35,4 +39,9 @@ void net_set_layer(Network *net, Layer *l, int index);
 
 void net_feed_forward(const Network *net, const Vector *input, Vector *output);
 
+double net_forward_loss(const Network *net, const Vector *prediciton,
+                        const Vector *target);
+
+void net_backpropagation(const Network *net, const Vector *prediciton,
+                         const Vector *target);
 #endif

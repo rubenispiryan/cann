@@ -3,12 +3,23 @@
 
 #include "vector.h"
 
-void activation_relu(Vector *input);
+typedef struct activation {
+    void (*forward) (Vector *);
+    void (*backward) (Vector *, const Vector *, const Vector *);
+} Activation;
 
-void activation_sigmoid(Vector *input);
+Activation *create_activation(void (*forward) (Vector *),
+                              void (*backward) (Vector *, const Vector *,
+                                                const Vector *));
 
-void activation_tanh(Vector *input);
+void destroy_activation(Activation *act);
 
-void activation_softmax(Vector *input);
+Activation *make_activation_relu();
+
+Activation *make_activation_sigmoid();
+
+Activation *make_activation_tanh();
+
+Activation *make_activation_softmax();
 
 #endif

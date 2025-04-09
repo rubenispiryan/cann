@@ -1,5 +1,20 @@
+#ifndef _LOSS_HEADER_
+#define _LOSS_HEADER_
+
 #include "vector.h"
 
-double mse(Vector *pred, Vector *target);
+typedef struct loss {
+    double (*forward) (const Vector *, const Vector *);
+    void (*backward) (Vector *, const Vector *, const Vector *);
+} Loss;
 
-double cross_entropy_binary(Vector *pred, Vector *target);
+Loss *create_loss(double (*forward) (const Vector *, const Vector *),
+                  void (*backward) (Vector *, const Vector *, const Vector *));
+
+void destroy_loss(Loss *l);
+
+Loss *make_mse();
+
+Loss *make_cross_entropy_binary();
+
+#endif

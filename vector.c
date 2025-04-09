@@ -35,6 +35,14 @@ void destroy_vector(Vector *v) {
     free(v);
 }
 
+void vector_copy_data(Vector *dst, const Vector *src) {
+    assert(dst);
+    assert(src);
+    assert(dst->n == src->n);
+    assert(dst->is_column == src->is_column);
+    memcpy(dst->data, src->data, src->n * sizeof(double));
+}
+
 int vector_get_n(const Vector *v) {
     assert(v);
     return v->n;
@@ -62,12 +70,31 @@ void vector_set_data(Vector *v, const double *data, int n_elem) {
     memcpy(v->data, data, sizeof(double) * n_elem);
 }
 
+void vector_set(Vector *v, double val, int index) {
+    assert(v);
+    assert(v->n > index && index >= 0);
+    v->data[index] = val;
+}
+
 void vector_map_data(Vector *v, double (*const func) (double, double),
                      double second) {
     assert(v);
     assert(func);
     for (int i = 0; i < v->n; i++) {
         v->data[i] = func(v->data[i], second);
+    }
+}
+
+void vector_map_data_to(Vector *dst, const Vector *src,
+                        double (*const func) (double, double),
+                        double second) {
+    assert(dst);
+    assert(src);
+    assert(func);
+    assert(dst->n == src->n);
+    assert(dst->is_column == src->is_column);
+    for (int i = 0; i < src->n; i++) {
+        dst->data[i] = func(src->data[i], second);
     }
 }
 
@@ -80,6 +107,29 @@ void vector_add(const Vector *v1, const Vector *v2, Vector *dst) {
     assert(v1->is_column == dst->is_column);
     for (int i = 0; i < v1->n; i++) {
         dst->data[i] = v1->data[i] + v2->data[i];
+    }
+}
+
+void vector_mul(const Vector *v1, const Vector *v2, Vector *dst) {
+    assert(v1);
+    assert(v2);
+    assert(dst);
+    assert(v1->n == v2->n);
+    assert(v1->n == dst->n);
+    assert(v1->is_column == v2->is_column);
+    assert(v1->is_column == dst->is_column);
+    for (int i = 0; i < v1->n; i++) {
+        dst->data[i] = v1->data[i] * v2->data[i];
+    }
+}
+
+void vector_scaled_sub(Vector *dst, const Vector *v, double scale) {
+    assert(dst);
+    assert(v);
+    assert(dst->n == v->n);
+    assert(dst->is_column == dst->is_column);
+    for (int i = 0; i < dst->n; i++) {
+        dst->data[i] -= scale * v->data[i];
     }
 }
 
