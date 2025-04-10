@@ -13,7 +13,7 @@ Layer *create_layer(int n_input, int n_output);
 
 void destroy_layer(Layer *l);
 
-Network *create_network(int n_layers, double lr);
+Network *create_network(int n_layers, float lr);
 
 void destroy_network(Network *net);
 
@@ -29,17 +29,17 @@ void layer_set_activation(Layer *l, Activation *act);
 
 void net_set_loss(Network *net, Loss *loss);
 
-void layer_initialize_weights(const Layer *l, double (*const method) (int, int));
+void layer_initialize_weights(const Layer *l, float (*const method) (int, int));
 
 void layer_initialize_bias(const Layer *l);
 
-void layer_initialize(const Layer *l, double (*const method) (int, int));
+void layer_initialize(const Layer *l, float (*const method) (int, int));
 
 void net_set_layer(Network *net, Layer *l, int index);
 
 void net_feed_forward(const Network *net, const Vector *input, Vector *output);
 
-double net_forward_loss(const Network *net, const Vector *prediciton,
+float net_forward_loss(const Network *net, const Vector *prediciton,
                         const Vector *target);
 
 void net_backpropagation(const Network *net, const Vector *prediciton,

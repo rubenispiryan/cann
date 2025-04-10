@@ -7,7 +7,7 @@
 #include "matrix.h"
 
 typedef struct matrix {
-    double *data;
+    float *data;
     int n_rows;
     int n_cols;
 } Matrix;
@@ -19,7 +19,7 @@ Matrix *create_matrix(int n_rows, int n_cols) {
     }
     m->n_cols = n_cols;
     m->n_rows = n_rows;
-    double *data = malloc(sizeof(double) * n_cols * n_rows);
+    float *data = malloc(sizeof(float) * n_cols * n_rows);
     if (data == NULL) {
         free(m);
         return NULL;
@@ -54,10 +54,10 @@ void matrix_copy(Matrix *dst_m, const Matrix *src_m) {
     assert(src_m);
     assert(dst_m->n_cols == src_m->n_cols);
     assert(dst_m->n_rows == src_m->n_rows);
-    memcpy(dst_m->data, src_m->data, sizeof(double) * dst_m->n_cols * dst_m->n_rows);
+    memcpy(dst_m->data, src_m->data, sizeof(float) * dst_m->n_cols * dst_m->n_rows);
 }
 
-void matrix_set(Matrix *m, double val, int row, int col) {
+void matrix_set(Matrix *m, float val, int row, int col) {
     assert(m);
     assert(m->n_rows > row && row >= 0);
     assert(m->n_cols > col && col >= 0);
@@ -75,13 +75,13 @@ void matrix_vec_mul(const Matrix *m, const Vector *v, Vector *res) {
     assert(vector_get_is_column(v));
     assert(vector_get_is_column(res));
 
-    const double *data = vector_get_data(v);
-    double *res_data = malloc(sizeof(double) * vector_get_n(res));
+    const float *data = vector_get_data(v);
+    float *res_data = malloc(sizeof(float) * vector_get_n(res));
     if (res_data == NULL) {
         return;
     }
     for (int i = 0; i < m->n_rows; i++) {
-        double total = 0;
+        float total = 0;
         for (int j = 0; j < m->n_cols; j++) {
             total += m->data[i * m->n_cols + j] * data[j];
         }
@@ -101,13 +101,13 @@ void matrix_T_vec_mul(const Matrix *m, const Vector *v, Vector *res) {
     assert(vector_get_is_column(v));
     assert(vector_get_is_column(res));
 
-    const double *data = vector_get_data(v);
-    double *res_data = malloc(sizeof(double) * vector_get_n(res));
+    const float *data = vector_get_data(v);
+    float *res_data = malloc(sizeof(float) * vector_get_n(res));
     if (res_data == NULL) {
         return;
     }
     for (int i = 0; i < m->n_cols; i++) {
-        double total = 0;
+        float total = 0;
         for (int j = 0; j < m->n_rows; j++) {
             total += m->data[j * m->n_cols + i] * data[j];
         }
@@ -126,8 +126,8 @@ void matrix_outer_mul(Matrix *dst, const Vector *left, const Vector *right) {
     assert(vector_get_is_column(left));
     assert(!vector_get_is_column(right));
 
-    const double *left_data = vector_get_data(left);
-    const double *right_data = vector_get_data(right);
+    const float *left_data = vector_get_data(left);
+    const float *right_data = vector_get_data(right);
     for (int i = 0; i < dst->n_rows; i++) {
         for (int j = 0; j < dst->n_cols; j++) {
             dst->data[i * dst->n_cols + j] = left_data[i] * right_data[j];
@@ -135,7 +135,7 @@ void matrix_outer_mul(Matrix *dst, const Vector *left, const Vector *right) {
     }
 }
 
-void matrix_scaled_sub(Matrix *dst, const Matrix *m, double scale) {
+void matrix_scaled_sub(Matrix *dst, const Matrix *m, float scale) {
     assert(dst);
     assert(m);
     int cols = dst->n_cols;
@@ -160,7 +160,7 @@ Matrix *matrix_make_from_k(int k, int n_rows, int n_cols) {
     return m;
 }
 
-void matrix_initialize(Matrix *m, double (*const method) (int, int)) {
+void matrix_initialize(Matrix *m, float (*const method) (int, int)) {
     assert(m);
     assert(method);
     for (int i = 0; i < m->n_cols * m->n_rows; i++) {

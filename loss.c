@@ -6,7 +6,7 @@
 #include "loss.h"
 #include "vector.h"
 
-Loss *create_loss(double (*forward) (const Vector *, const Vector *),
+Loss *create_loss(float (*forward) (const Vector *, const Vector *),
                   void (*backward) (Vector *, const Vector *, const Vector *)) {
     Loss *l = malloc(sizeof(Loss));
     if (l == NULL) {
@@ -26,17 +26,17 @@ void destroy_loss(Loss *l) {
     free(l);
 }
 
-static double mse_forward(const Vector *pred, const Vector *target) {
+static float mse_forward(const Vector *pred, const Vector *target) {
     assert(pred);
     assert(target);
     int n = vector_get_n(pred);
     assert(n == vector_get_n(target));
     assert(vector_get_is_column(pred) == vector_get_is_column(target));
-    double total = 0;
-    const double *pred_data = vector_get_data(pred);
-    const double *target_data = vector_get_data(target);
+    float total = 0;
+    const float *pred_data = vector_get_data(pred);
+    const float *target_data = vector_get_data(target);
     for (int i = 0; i < n; i++) {
-        double diff = pred_data[i] - target_data[i];
+        float diff = pred_data[i] - target_data[i];
         total += diff * diff;
     }
     total /= n;
@@ -51,8 +51,8 @@ static void mse_backward(Vector *delta, const Vector *pred,
     int n = vector_get_n(pred);
     assert(n == vector_get_n(target));
     assert(n == vector_get_n(delta));
-    const double *pred_data = vector_get_data(pred);
-    const double *target_data = vector_get_data(target);
+    const float *pred_data = vector_get_data(pred);
+    const float *target_data = vector_get_data(target);
     for (int i = 0; i < n; i++) {
         vector_set(delta, (2.0 / n) * (pred_data[i] - target_data[i]), i);
     }
@@ -64,18 +64,18 @@ Loss *make_mse() {
 }
 
 // TODO: implement
-static double cross_entropy_binary(Vector *pred, Vector *target) {
+static float cross_entropy_binary(Vector *pred, Vector *target) {
     assert(pred);
     assert(target);
     int n = vector_get_n(pred);
     assert(n == vector_get_n(target));
     assert(vector_get_is_column(pred) == vector_get_is_column(target));
-    double total = 0;
-    const double *pred_data = vector_get_data(pred);
-    const double *target_data = vector_get_data(target);
-    const double epsilon = 1e-12;
+    float total = 0;
+    const float *pred_data = vector_get_data(pred);
+    const float *target_data = vector_get_data(target);
+    const float epsilon = 1e-12;
     for (int i = 0; i < n; i++) {
-        double p = fmax(fmin(pred_data[i], 1.0 - epsilon), epsilon);
+        float p = fmax(fmin(pred_data[i], 1.0 - epsilon), epsilon);
         total += target_data[i] * log(p) + (1 - target_data[i]) * log(1 - p);
     }
     total /= n;

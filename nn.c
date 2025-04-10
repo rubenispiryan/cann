@@ -26,7 +26,7 @@ typedef struct network {
     Layer **layers;
     int n_layers;
     Loss *loss;
-    double learning_rate;
+    float learning_rate;
 } Network;
 
 Cache *create_cache(int n_input, int n_output) {
@@ -125,7 +125,7 @@ void destroy_layer(Layer *l) {
     free(l);
 }
 
-Network *create_network(int n_layers, double lr) {
+Network *create_network(int n_layers, float lr) {
     Layer **layers = malloc(sizeof(Layer *) * n_layers);
     if (layers == NULL) {
         return NULL;
@@ -193,13 +193,13 @@ void net_set_loss(Network *net, Loss *loss) {
 }
 
 void layer_initialize_weights(const Layer *l,
-                              double (*const method) (int, int)) {
+                              float (*const method) (int, int)) {
     assert(l);
     assert(method);
     matrix_initialize(l->weights, method);
 }
 
-static double zero_initializator(int n) {
+static float zero_initializator(int n) {
     return 0;
 }
 
@@ -208,7 +208,7 @@ void layer_initialize_bias(const Layer *l) {
     vector_initialize(l->bias, &zero_initializator);
 }
 
-void layer_initialize(const Layer *l, double (*const method) (int, int)) {
+void layer_initialize(const Layer *l, float (*const method) (int, int)) {
     assert(l);
     layer_initialize_weights(l, method);
     layer_initialize_bias(l);
@@ -248,7 +248,7 @@ void net_feed_forward(const Network *net, const Vector *input, Vector *output) {
     vector_set_data(output, vector_get_data(input), vector_get_n(input));
 }
 
-double net_forward_loss(const Network *net, const Vector *prediction,
+float net_forward_loss(const Network *net, const Vector *prediction,
                         const Vector *target) {
     assert(net);
     assert(prediction);
@@ -258,7 +258,7 @@ double net_forward_loss(const Network *net, const Vector *prediction,
 }
 
 static void layer_update(const Layer *l, const Matrix *dW, const Vector *db,
-                        double lr) {
+                        float lr) {
     assert(l);
     assert(dW);
     assert(db);

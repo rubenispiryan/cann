@@ -8,7 +8,7 @@
 #include "vector.h"
 
 typedef struct vector {
-    double *data;
+    float *data;
     int n;
     bool is_column;
 } Vector;
@@ -18,7 +18,7 @@ Vector *create_vector(int n, bool is_column) {
     if (v == NULL) {
         return NULL;
     }
-    double *data = malloc(sizeof(double) * n);
+    float *data = malloc(sizeof(float) * n);
     if (data == NULL) {
         free(v);
         return NULL;
@@ -40,7 +40,7 @@ void vector_copy_data(Vector *dst, const Vector *src) {
     assert(src);
     assert(dst->n == src->n);
     assert(dst->is_column == src->is_column);
-    memcpy(dst->data, src->data, src->n * sizeof(double));
+    memcpy(dst->data, src->data, src->n * sizeof(float));
 }
 
 int vector_get_n(const Vector *v) {
@@ -48,7 +48,7 @@ int vector_get_n(const Vector *v) {
     return v->n;
 }
 
-const double *vector_get_data(const Vector *v) {
+const float *vector_get_data(const Vector *v) {
     assert(v);
     return v->data;
 }
@@ -63,21 +63,21 @@ void vector_transpose(Vector *v) {
     v->is_column = !v->is_column;
 }
 
-void vector_set_data(Vector *v, const double *data, int n_elem) {
+void vector_set_data(Vector *v, const float *data, int n_elem) {
     assert(v);
     assert(data);
     assert(n_elem <= v->n);
-    memcpy(v->data, data, sizeof(double) * n_elem);
+    memcpy(v->data, data, sizeof(float) * n_elem);
 }
 
-void vector_set(Vector *v, double val, int index) {
+void vector_set(Vector *v, float val, int index) {
     assert(v);
     assert(v->n > index && index >= 0);
     v->data[index] = val;
 }
 
-void vector_map_data(Vector *v, double (*const func) (double, double),
-                     double second) {
+void vector_map_data(Vector *v, float (*const func) (float, float),
+                     float second) {
     assert(v);
     assert(func);
     for (int i = 0; i < v->n; i++) {
@@ -86,8 +86,8 @@ void vector_map_data(Vector *v, double (*const func) (double, double),
 }
 
 void vector_map_data_to(Vector *dst, const Vector *src,
-                        double (*const func) (double, double),
-                        double second) {
+                        float (*const func) (float, float),
+                        float second) {
     assert(dst);
     assert(src);
     assert(func);
@@ -123,7 +123,7 @@ void vector_mul(const Vector *v1, const Vector *v2, Vector *dst) {
     }
 }
 
-void vector_scaled_sub(Vector *dst, const Vector *v, double scale) {
+void vector_scaled_sub(Vector *dst, const Vector *v, float scale) {
     assert(dst);
     assert(v);
     assert(dst->n == v->n);
@@ -133,7 +133,7 @@ void vector_scaled_sub(Vector *dst, const Vector *v, double scale) {
     }
 }
 
-void vector_initialize(Vector *v, double (*const method) (int)) {
+void vector_initialize(Vector *v, float (*const method) (int)) {
     assert(v);
     assert(method);
     for (int i = 0; i < v->n; i++) {

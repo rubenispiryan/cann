@@ -4,11 +4,11 @@
 #include "vector.h"
 
 typedef struct loss {
-    double (*forward) (const Vector *, const Vector *);
+    float (*forward) (const Vector *, const Vector *);
     void (*backward) (Vector *, const Vector *, const Vector *);
 } Loss;
 
-Loss *create_loss(double (*forward) (const Vector *, const Vector *),
+Loss *create_loss(float (*forward) (const Vector *, const Vector *),
                   void (*backward) (Vector *, const Vector *, const Vector *));
 
 void destroy_loss(Loss *l);

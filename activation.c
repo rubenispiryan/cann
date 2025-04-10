@@ -28,11 +28,11 @@ void destroy_activation(Activation *act) {
     free(act);
 }
 
-static double relu(double input, double second) {
+static float relu(float input, float second) {
     return input > 0 ? input : 0;
 }
 
-static double relu_dx(double input, double second) {
+static float relu_dx(float input, float second) {
     return input > 0 ? 1 : 0;
 }
 
@@ -53,11 +53,11 @@ Activation *make_activation_relu() {
     return act;
 }
 
-static double sigmoid(double input, double second) {
+static float sigmoid(float input, float second) {
     return 1.0 / (1.0 + exp(-input));
 }
 
-static double sigmoid_dx(double input, double second) {
+static float sigmoid_dx(float input, float second) {
     return input * (1.0 - input);
 }
 
@@ -78,12 +78,12 @@ Activation *make_activation_sigmoid() {
     return act;
 }
 
-static double ttanh(double input, double second) {
+static float ttanh(float input, float second) {
     return tanh(input);
 }
 
-static double ttanh_dx(double input, double second) {
-    double sech = cosh(input);
+static float ttanh_dx(float input, float second) {
+    float sech = cosh(input);
     return 1.0 / (sech * sech);
 }
 
@@ -104,26 +104,26 @@ Activation *make_activation_tanh() {
     return act;
 }
 
-static double exp_with_diff(double input, double second) {
+static float exp_with_diff(float input, float second) {
     return exp(input - second);
 }
 
-static double divide(double input, double second) {
+static float divide(float input, float second) {
     return input / second;
 }
 
 static void softmax_forward(Vector *input) {
     assert(input);
     int n = vector_get_n(input);
-    const double *data = vector_get_data(input);
-    double max_val = data[0];
+    const float *data = vector_get_data(input);
+    float max_val = data[0];
     for (int i = 0; i < n; i++) {
         if (max_val < data[i]) {
             max_val = data[i];
         }
     }
     vector_map_data(input, exp_with_diff, max_val);
-    double total = 0;
+    float total = 0;
     for (int i = 0; i < n; i++) {
         total += data[i];
     }
@@ -135,10 +135,10 @@ static void softmax_dx(Matrix *jacobian, const Vector *soft_maxed_data) {
     assert(jacobian);
     int n_rows = matrix_get_n_rows(jacobian);
     int n_cols = matrix_get_n_cols(jacobian);
-    const double *data = vector_get_data(soft_maxed_data);
+    const float *data = vector_get_data(soft_maxed_data);
     for (int i = 0; i < n_rows; i++) {
         for (int j = 0; j < n_cols; j++) {
-            double value = 0;
+            float value = 0;
             if (i == j) {
                 value = data[i] * (1.0 - data[i]);
             } else {

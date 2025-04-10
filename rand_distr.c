@@ -9,36 +9,36 @@ int rand_int(int a, int b) {
     return a + rand() % (b - a + 1);
 }
 
-double rand_uniform(double left, double right) {
+float rand_uniform(float left, float right) {
     assert(left <= right);
-    double uniform_number = rand();
-    return (right - left) * (uniform_number / (double) RAND_MAX) + left;
+    float uniform_number = rand();
+    return (right - left) * (uniform_number / (float) RAND_MAX) + left;
 }
 
-double rand_normal(double mean, double std) {
-    double u1 = rand() / (double) RAND_MAX;
-    double u2 = rand() / (double) RAND_MAX;
-    double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
+float rand_normal(float mean, float std) {
+    float u1 = rand() / (float) RAND_MAX;
+    float u2 = rand() / (float) RAND_MAX;
+    float z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
     return z0 * std + mean;
 }
 
-double uniform_xavier(int n_input, int n_output) {
-    double range = sqrt(6.0 / (n_input + n_output));
+float uniform_xavier(int n_input, int n_output) {
+    float range = sqrt(6.0 / (n_input + n_output));
     return rand_uniform(-range, range);
 }
 
-double normal_xavier(int n_input, int n_output) {
-    double sigma = sqrt(2.0 / (n_input + n_output));
+float normal_xavier(int n_input, int n_output) {
+    float sigma = sqrt(2.0 / (n_input + n_output));
     return rand_normal(0, sigma);
 }
 
-double uniform_he(int n_input, int n_output) {
-    double left = -sqrt(6.0 / n_input);
-    double right = sqrt(6.0 / n_output);
+float uniform_he(int n_input, int n_output) {
+    float left = -sqrt(6.0 / n_input);
+    float right = sqrt(6.0 / n_output);
     return rand_uniform(left, right);
 }
 
-double normal_he(int n_input, int n_output) {
-    double sigma = sqrt(2.0 / n_input);
+float normal_he(int n_input, int n_output) {
+    float sigma = sqrt(2.0 / n_input);
     return rand_normal(0, sigma);
 }

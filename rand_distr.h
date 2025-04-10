@@ -3,16 +3,16 @@
 
 int rand_int(int a, int b);
 
-double rand_uniform(double left, double right);
+float rand_uniform(float left, float right);
 
-double rand_normal(double mean, double std);
+float rand_normal(float mean, float std);
 
-double uniform_xavier(int n_input, int n_output);
+float uniform_xavier(int n_input, int n_output);
 
-double normal_xavier(int n_input, int n_output);
+float normal_xavier(int n_input, int n_output);
 
-double uniform_he(int n_input, int n_output);
+float uniform_he(int n_input, int n_output);
 
-double normal_he(int n_input, int n_output);
+float normal_he(int n_input, int n_output);
 
 #endif
