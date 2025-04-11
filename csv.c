@@ -204,7 +204,78 @@ CSV *read_csv(const char *filename_str) {
     return csv;
 }
 
-static void csv_print_header(const CSV *csv) {
+int csv_get_n_rows(const CSV *csv) {
+    assert(csv);
+    return csv->n_rows;
+}
+
+int csv_get_n_cols(const CSV *csv) {
+    assert(csv);
+    return csv->count;
+}
+
+void csv_get_row(float *row, int row_size, const CSV *csv, int row_i) {
+    assert(row);
+    assert(csv);
+    int n_cols = csv->count;
+    assert(row_size == n_cols);
+    assert(csv->n_rows > row_i && row_i >= 0);
+    for (int i = 0; i < n_cols; i++) {
+        row[i] = csv->items[i]->items[row_i];
+    }
+}
+
+void csv_as_matrix(Matrix *m, const CSV *csv) {
+    assert(m);
+    assert(csv);
+    int n_cols = csv->count;
+    int n_rows = csv->n_rows;
+    assert(matrix_get_n_cols(m) == n_cols);
+    assert(matrix_get_n_rows(m) == n_rows);
+    for (int i = 0; i < n_rows; i++) {
+        for (int j = 0; j < n_cols; j++) {
+            matrix_set(m, csv->items[j]->items[i], i, j);
+        }
+    }
+}
+
+void csv_col_as_vec(Vector *v, const char *col_name_str, const CSV *csv) {
+    assert(v);
+    assert(csv);
+    assert(col_name_str);
+    assert(vector_get_n(v) == csv->n_rows);
+    int n_cols = csv->count;
+    for (int i = 0; i < n_cols; i++) {
+        if (strcmp(col_name_str, csv->items[i]->col_name_str) == 0) {
+            vector_set_data(v, csv->items[i]->items, csv->n_rows);
+            return;
+        }
+    }
+}
+
+void csv_remove_col(CSV *csv, const char *col_name_str) {
+    assert(csv);
+    assert(col_name_str);
+    int n_cols = csv->count;
+    int i = 0;
+    while (i < n_cols && strcmp(col_name_str,
+                                csv->items[i]->col_name_str) != 0) {
+        i++;
+    }
+    if (i == n_cols) {
+        return;
+    }
+    destroy_column(csv->items[i]);
+    i++;
+    while (i < n_cols) {
+        csv->items[i - 1] = csv->items[i];
+        i++;
+    }
+    csv->items[n_cols - 1] = NULL;
+    csv->count--;
+}
+
+void csv_print_header(const CSV *csv) {
     assert(csv);
     int n_cols = csv->count;
     for (int i = 0; i < n_cols; i++) {
@@ -216,7 +287,7 @@ static void csv_print_header(const CSV *csv) {
     printf("\n");
 }
 
-static void csv_print_row(const CSV *csv, int index) {
+void csv_print_row(const CSV *csv, int index) {
     assert(csv);
     assert(csv->n_rows > index && index >= 0);
     int n_cols = csv->count;
