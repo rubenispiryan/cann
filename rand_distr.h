@@ -15,4 +15,6 @@ float uniform_he(int n_input, int n_output);
 
 float normal_he(int n_input, int n_output);
 
+void shuffle(int *data, int n);
+
 #endif

@@ -13,6 +13,8 @@ void vector_copy_data(Vector *dst, const Vector *src);
 
 int vector_get_n(const Vector *v);
 
+float vector_get(const Vector *v, int index);
+
 const float *vector_get_data(const Vector *v);
 
 bool vector_get_is_column(const Vector *v);

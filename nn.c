@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "nn.h"
+#include "rand_distr.h"
 
 typedef struct {
     Vector *prev;
@@ -307,4 +308,45 @@ void net_backpropagation(const Network *net, const Vector *prediciton,
         destroy_vector(act_dx);
         destroy_matrix(dW);
     }
+}
+
+void net_train(const Network *net, const Matrix *X, const Matrix *Y,
+    int epochs) {
+    assert(net);
+    assert(X);
+    assert(Y);
+    int n = matrix_get_n_rows(X);
+    assert(n == matrix_get_n_rows(Y));
+    int *indices = malloc(sizeof(int) * n);
+    for (int i = 0; i < n; i++) {
+        indices[i] = i;
+    }
+    int x_cols = matrix_get_n_cols(X);
+    int y_cols = matrix_get_n_cols(Y);
+    Vector *input = create_vector(x_cols, true);
+    Vector *target = create_vector(y_cols, true);
+    Vector *output = create_vector(y_cols, true);
+    for (int i = 0; i < epochs; i++) {
+        printf("--------------\n");
+        printf("EPOCH: %d\n", i);
+        shuffle(indices, n);
+        float total_loss = 0;
+        for (int j = 0; j < n; j++) {
+            int k = indices[j];
+            float *inp = matrix_get_row(X, k);
+            float *targ = matrix_get_row(Y, k);
+            vector_set_data(input, inp, x_cols);
+            vector_set_data(target, targ, y_cols);
+            net_feed_forward(net, input, output);
+            float loss = net_forward_loss(net, output, target);
+            printf("Loss: %.2f\n", loss);
+            total_loss += loss;
+            net_backpropagation(net, output, target);
+        }
+        printf("Avg Loss: %.2f\n", total_loss / n);
+    }
+    destroy_vector(input);
+    destroy_vector(target);
+    destroy_vector(output);
+    free(indices);
 }

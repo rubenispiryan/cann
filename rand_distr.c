@@ -42,3 +42,13 @@ float normal_he(int n_input, int n_output) {
     float sigma = sqrt(2.0 / n_input);
     return rand_normal(0, sigma);
 }
+
+void shuffle(int *data, int n) {
+    assert(data);
+    for (int i = 0; i < n; i++) {
+        int idx = rand_int(i, n - 1);
+        int temp = data[i];
+        data[i] = data[idx];
+        data[idx] = temp;
+    }
+}

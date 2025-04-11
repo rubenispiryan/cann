@@ -253,6 +253,23 @@ void csv_col_as_vec(Vector *v, const char *col_name_str, const CSV *csv) {
     }
 }
 
+void csv_col_as_mat(Matrix *m, const char *col_name_str, const CSV *csv) {
+    assert(m);
+    assert(csv);
+    int n_cols = csv->count;
+    int n_rows = csv->n_rows;
+    assert(matrix_get_n_cols(m) == 1);
+    assert(matrix_get_n_rows(m) == n_rows);
+    for (int j = 0; j < n_cols; j++) {
+        if (strcmp(col_name_str, csv->items[j]->col_name_str) == 0) {
+            for (int i = 0; i < n_rows; i++) {
+                matrix_set(m, csv->items[j]->items[i], i, 0);
+            }
+            return;
+        }
+    }
+}
+
 void csv_remove_col(CSV *csv, const char *col_name_str) {
     assert(csv);
     assert(col_name_str);

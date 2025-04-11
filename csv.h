@@ -20,6 +20,8 @@ void csv_as_matrix(Matrix *m, const CSV *csv);
 
 void csv_col_as_vec(Vector *v, const char *col_name_str, const CSV *csv);
 
+void csv_col_as_mat(Matrix *m, const char *col_name_str, const CSV *csv);
+
 void csv_remove_col(CSV *csv, const char *col_name_str);
 
 void csv_print_header(const CSV *csv);

@@ -48,6 +48,12 @@ int vector_get_n(const Vector *v) {
     return v->n;
 }
 
+float vector_get(const Vector *v, int index) {
+    assert(v);
+    assert(v->n > index && index >= 0);
+    return v->data[index];
+}
+
 const float *vector_get_data(const Vector *v) {
     assert(v);
     return v->data;

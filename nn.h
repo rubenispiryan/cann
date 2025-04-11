@@ -44,4 +44,7 @@ float net_forward_loss(const Network *net, const Vector *prediciton,
 
 void net_backpropagation(const Network *net, const Vector *prediciton,
                          const Vector *target);
+
+void net_train(const Network *net, const Matrix *X, const Matrix *y,
+               int epochs);
 #endif
