@@ -49,7 +49,7 @@ int matrix_get_n_cols(const Matrix *m) {
     return m->n_cols;
 }
 
-float *matrix_get_row(const Matrix *m, int row_i) {
+const float *matrix_get_row(const Matrix *m, int row_i) {
     assert(m);
     assert(m->n_rows > row_i && row_i >= 0);
     return &m->data[row_i * m->n_cols];

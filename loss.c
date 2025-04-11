@@ -62,8 +62,7 @@ Loss *make_mse() {
     return create_loss(mse_forward, mse_backward);
 }
 
-// TODO: implement
-static float ceb_forward(Vector *pred, Vector *target) {
+static float ceb_forward(const Vector *pred, const Vector *target) {
     assert(pred);
     assert(target);
     int n = vector_get_n(pred);
@@ -73,9 +72,12 @@ static float ceb_forward(Vector *pred, Vector *target) {
     const float *pred_data = vector_get_data(pred);
     const float *target_data = vector_get_data(target);
     const float epsilon = 1e-12;
+    float y = 0;
+    float y_hat = 0;
     for (int i = 0; i < n; i++) {
-        float p = fmax(fmin(pred_data[i], 1.0 - epsilon), epsilon);
-        total += target_data[i] * log(p) + (1 - target_data[i]) * log(1 - p);
+        y = target_data[i];
+        y_hat = fmax(fmin(pred_data[i], 1.0 - epsilon), epsilon);
+        total += y * log(y_hat) + (1 - y) * log(1 - y_hat);
     }
     total /= n;
     return -total;

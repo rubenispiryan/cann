@@ -37,7 +37,7 @@ void layer_initialize(const Layer *l, float (*const method) (int, int));
 
 void net_set_layer(Network *net, Layer *l, int index);
 
-void net_feed_forward(const Network *net, const Vector *input, Vector *output);
+void net_predict(const Network *net, const Vector *input, Vector *output);
 
 float net_forward_loss(const Network *net, const Vector *prediciton,
                         const Vector *target);

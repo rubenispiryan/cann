@@ -179,6 +179,7 @@ static void softmax_backward(Vector *delta, const Vector *input,
     destroy_vector(temp);
 }
 
+// TODO: test with appropriate dataset
 Activation *make_activation_softmax() {
     return create_activation(softmax_forward, softmax_backward);
 }

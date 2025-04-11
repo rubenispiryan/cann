@@ -15,7 +15,7 @@ int matrix_get_n_rows(const Matrix *m);
 
 int matrix_get_n_cols(const Matrix *m);
 
-float *matrix_get_row(const Matrix *m, int row_i);
+const float *matrix_get_row(const Matrix *m, int row_i);
 
 void matrix_copy(Matrix *dst_m, const Matrix *src_m);
 
