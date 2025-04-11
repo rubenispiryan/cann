@@ -5,11 +5,11 @@
 
 typedef struct activation {
     void (*forward) (Vector *);
-    void (*backward) (Vector *, const Vector *, const Vector *);
+    void (*update_delta) (Vector *, const Vector *, const Vector *);
 } Activation;
 
 Activation *create_activation(void (*forward) (Vector *),
-                              void (*backward) (Vector *, const Vector *,
+                              void (*update_delta) (Vector *, const Vector *,
                                                 const Vector *));
 
 void destroy_activation(Activation *act);

@@ -116,7 +116,7 @@ void vector_add(const Vector *v1, const Vector *v2, Vector *dst) {
     }
 }
 
-void vector_mul(const Vector *v1, const Vector *v2, Vector *dst) {
+void vector_dot(const Vector *v1, const Vector *v2, Vector *dst) {
     assert(v1);
     assert(v2);
     assert(dst);

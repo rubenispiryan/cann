@@ -34,7 +34,7 @@ void vector_map_data_to(Vector *dst, const Vector *src,
 
 void vector_add(const Vector *v1, const Vector *v2, Vector *dst);
 
-void vector_mul(const Vector *v1, const Vector *v2, Vector *dst);
+void vector_dot(const Vector *v1, const Vector *v2, Vector *dst);
 
 void vector_scaled_sub(Vector *dst, const Vector *v, float scale);
 

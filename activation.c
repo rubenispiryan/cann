@@ -8,7 +8,7 @@
 #include "matrix.h"
 
 Activation *create_activation(void (*forward) (Vector *),
-                              void (*backward) (Vector *, const Vector *,
+                              void (*update_delta) (Vector *, const Vector *,
                                                 const Vector *)) {
     Activation *act = malloc(sizeof(Activation));
     if (act == NULL) {
@@ -17,8 +17,8 @@ Activation *create_activation(void (*forward) (Vector *),
     if (forward != NULL) {
         act->forward = forward;
     }
-    if (backward != NULL) {
-        act->backward = backward;
+    if (update_delta != NULL) {
+        act->update_delta = update_delta;
     }
     return act;
 }
@@ -41,11 +41,15 @@ static void relu_forward(Vector *input) {
     vector_map_data(input, &relu, 0);
 }
 
-static void relu_backward(Vector *output, const Vector *input,
+static void relu_backward(Vector *delta, const Vector *input,
                           const Vector *post_act) {
     assert(input);
-    assert(output);
-    vector_map_data_to(output, input, relu_dx, 0);
+    assert(delta);
+    Vector *act_dx = create_vector(vector_get_n(delta), true);
+    assert(act_dx);
+    vector_map_data_to(act_dx, input, relu_dx, 0);
+    vector_dot(delta, act_dx, delta);
+    destroy_vector(act_dx);
 }
 
 Activation *make_activation_relu() {
@@ -66,11 +70,14 @@ static void sigmoid_forward(Vector *input) {
     vector_map_data(input, &sigmoid, 0);
 }
 
-static void sigmoid_backward(Vector *output, const Vector *input,
+static void sigmoid_backward(Vector *delta, const Vector *input,
                              const Vector *post_act) {
     assert(input);
-    assert(output);
-    vector_map_data_to(output, post_act, sigmoid_dx, 0);
+    Vector *act_dx = create_vector(vector_get_n(delta), true);
+    assert(act_dx);
+    vector_map_data_to(act_dx, post_act, sigmoid_dx, 0);
+    vector_dot(delta, act_dx, delta);
+    destroy_vector(act_dx);
 }
 
 Activation *make_activation_sigmoid() {
@@ -92,11 +99,14 @@ static void tanh_forward(Vector *input) {
     vector_map_data(input, &ttanh, 0);
 }
 
-static void tanh_backward(Vector *output, const Vector *input,
+static void tanh_backward(Vector *delta, const Vector *input,
                           const Vector *post_act) {
     assert(input);
-    assert(output);
-    vector_map_data_to(output, input, ttanh_dx, 0);
+    Vector *act_dx = create_vector(vector_get_n(delta), true);
+    assert(act_dx);
+    vector_map_data_to(act_dx, input, ttanh_dx, 0);
+    vector_dot(delta, act_dx, delta);
+    destroy_vector(act_dx);
 }
 
 Activation *make_activation_tanh() {
@@ -149,19 +159,26 @@ static void softmax_dx(Matrix *jacobian, const Vector *soft_maxed_data) {
     }
 }
 
-static void softmax_backward(Vector *output, const Vector *input,
+static void softmax_backward(Vector *delta, const Vector *input,
                              const Vector *post_act) {
-    assert(output);
+    assert(delta);
     assert(input);
     assert(post_act);
-    int n = vector_get_n(output);
+    int n = vector_get_n(delta);
     assert(n == vector_get_n(input));
     assert(n == vector_get_n(post_act));
     Matrix *jacobian = create_matrix(n, n);
+    Vector *temp = create_vector(n, true);
+    assert(temp);
+    assert(jacobian);
+
     softmax_dx(jacobian, post_act);
+    matrix_vec_mul(jacobian, delta, temp);
+    vector_copy_data(delta, temp);
+    destroy_matrix(jacobian);
+    destroy_vector(temp);
 }
-// TODO: implement
+
 Activation *make_activation_softmax() {
-    assert(false);
-    return NULL;
+    return create_activation(softmax_forward, softmax_backward);
 }

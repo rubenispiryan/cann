@@ -181,7 +181,7 @@ void layer_set_activation(Layer *l, Activation *act) {
     assert(l);
     assert(act);
     assert(act->forward);
-    assert(act->backward);
+    assert(act->update_delta);
     l->act = act;
 }
 
@@ -287,15 +287,11 @@ void net_backpropagation(const Network *net, const Vector *prediciton,
         Cache *cache = current_layer->cache;
         delta = cache->delta;
         assert(delta);
-
-        Vector *act_dx = create_vector(current_layer->n, true);
         Matrix *dW = create_matrix(current_layer->n,
                                    vector_get_n(cache->prev));
-
         if (current_layer->act) {
-            current_layer->act->backward(act_dx, cache->pre_act,
+            current_layer->act->update_delta(delta, cache->pre_act,
                                         cache->post_act);
-            vector_mul(delta, act_dx, delta);
         }
         vector_transpose(cache->prev);
         matrix_outer_mul(dW, delta, cache->prev);
@@ -305,7 +301,6 @@ void net_backpropagation(const Network *net, const Vector *prediciton,
                              net->layers[i - 1]->cache->delta);
         }
         layer_update(current_layer, dW, cache->delta, net->learning_rate);
-        destroy_vector(act_dx);
         destroy_matrix(dW);
     }
 }
