@@ -59,12 +59,11 @@ static void mse_backward(Vector *delta, const Vector *pred,
 }
 
 Loss *make_mse() {
-    Loss *l = create_loss(mse_forward, mse_backward);
-    return l;
+    return create_loss(mse_forward, mse_backward);
 }
 
 // TODO: implement
-static float cross_entropy_binary(Vector *pred, Vector *target) {
+static float ceb_forward(Vector *pred, Vector *target) {
     assert(pred);
     assert(target);
     int n = vector_get_n(pred);
@@ -80,4 +79,30 @@ static float cross_entropy_binary(Vector *pred, Vector *target) {
     }
     total /= n;
     return -total;
+}
+
+static void ceb_backward(Vector *delta, const Vector *pred, 
+                         const Vector *target) {
+    assert(delta);
+    assert(pred);
+    assert(target);
+    int n = vector_get_n(pred);
+    assert(n == vector_get_n(target));
+    assert(n == vector_get_n(delta));
+    const float *pred_data = vector_get_data(pred);
+    const float *target_data = vector_get_data(target);
+    const float epsilon = 1e-12;
+    float value = 0;
+    float y = 0;
+    float y_hat = 0;
+    for (int i = 0; i < n; i++) {
+        y = target_data[i];
+        y_hat = fmax(fmin(pred_data[i], 1.0 - epsilon), epsilon);
+        value = y / y_hat - (1.0 - y) / (1.0 - y_hat);
+        vector_set(delta, -value / n, i);
+    }
+}
+
+Loss *make_ceb() {
+    return create_loss(ceb_forward, ceb_backward);
 }

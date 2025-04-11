@@ -15,6 +15,6 @@ void destroy_loss(Loss *l);
 
 Loss *make_mse();
 
-Loss *make_cross_entropy_binary();
+Loss *make_ceb();
 
 #endif
