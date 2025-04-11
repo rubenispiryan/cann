@@ -6,6 +6,7 @@
 
 #include "nn.h"
 #include "rand_distr.h"
+#include "config.h"
 
 typedef struct {
     Vector *prev;
@@ -236,7 +237,7 @@ static void layer_apply(Layer *l, const Vector *input) {
     vector_copy_data(l->cache->post_act, l->output);
 }
 
-void net_feed_forward(const Network *net, const Vector *input, Vector *output) {
+void net_predict(const Network *net, const Vector *input, Vector *output) {
     assert(net);
     assert(input);
     assert(output);
@@ -322,23 +323,29 @@ void net_train(const Network *net, const Matrix *X, const Matrix *Y,
     Vector *target = create_vector(y_cols, true);
     Vector *output = create_vector(y_cols, true);
     for (int i = 0; i < epochs; i++) {
-        printf("--------------\n");
-        printf("EPOCH: %d\n", i);
+        #ifdef VERBOSE
+            printf("--------------\n");
+            printf("EPOCH: %d\n", i);
+        #endif
         shuffle(indices, n);
         float total_loss = 0;
         for (int j = 0; j < n; j++) {
             int k = indices[j];
-            float *inp = matrix_get_row(X, k);
-            float *targ = matrix_get_row(Y, k);
+            const float *inp = matrix_get_row(X, k);
+            const float *targ = matrix_get_row(Y, k);
             vector_set_data(input, inp, x_cols);
             vector_set_data(target, targ, y_cols);
-            net_feed_forward(net, input, output);
+            net_predict(net, input, output);
             float loss = net_forward_loss(net, output, target);
-            printf("Loss: %.2f\n", loss);
+            #ifdef DEBUG
+                printf("Loss: %.2f\n", loss);
+            #endif
             total_loss += loss;
             net_backpropagation(net, output, target);
         }
-        printf("Avg Loss: %.2f\n", total_loss / n);
+        #ifdef VERBOSE
+            printf("Avg Loss: %.2f\n", total_loss / n);
+        #endif
     }
     destroy_vector(input);
     destroy_vector(target);
