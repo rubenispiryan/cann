@@ -15,11 +15,15 @@ int matrix_get_n_rows(const Matrix *m);
 
 int matrix_get_n_cols(const Matrix *m);
 
-const float *matrix_get_row(const Matrix *m, int row_i);
+void matrix_row_as_vec(Vector *dst, const Matrix *m, int row_i);
 
 void matrix_copy(Matrix *dst_m, const Matrix *src_m);
 
+void matrix_copy_head(Matrix *dst_m, const Matrix *src_m, int rows);
+
 void matrix_set(Matrix *m, float val, int row, int col);
+
+void matrix_set_row(Matrix *m, const Vector *src, int row);
 
 void matrix_vec_mul(const Matrix *m, const Vector *v, Vector *res);
 

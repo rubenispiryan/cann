@@ -49,10 +49,15 @@ int matrix_get_n_cols(const Matrix *m) {
     return m->n_cols;
 }
 
-const float *matrix_get_row(const Matrix *m, int row_i) {
+void matrix_row_as_vec(Vector *dst, const Matrix *m, int row_i) {
     assert(m);
+    assert(dst);
     assert(m->n_rows > row_i && row_i >= 0);
-    return &m->data[row_i * m->n_cols];
+    int n = vector_get_n(dst);
+    assert(n == matrix_get_n_cols(m));
+    for (int i = 0; i < n; i++) {
+        vector_set(dst, m->data[row_i * n + i], i);
+    }
 }
 
 void matrix_copy(Matrix *dst_m, const Matrix *src_m) {
@@ -60,7 +65,18 @@ void matrix_copy(Matrix *dst_m, const Matrix *src_m) {
     assert(src_m);
     assert(dst_m->n_cols == src_m->n_cols);
     assert(dst_m->n_rows == src_m->n_rows);
-    memcpy(dst_m->data, src_m->data, sizeof(float) * dst_m->n_cols * dst_m->n_rows);
+    memcpy(dst_m->data, src_m->data,
+           sizeof(float) * dst_m->n_cols * dst_m->n_rows);
+}
+
+void matrix_copy_head(Matrix *dst_m, const Matrix *src_m, int rows) {
+    assert(dst_m);
+    assert(src_m);
+    assert(dst_m->n_cols == src_m->n_cols);
+    assert(rows > 0 && rows <= dst_m->n_rows);
+    assert(dst_m->n_rows == rows);
+    memcpy(dst_m->data, src_m->data,
+           sizeof(float) * dst_m->n_cols * rows);
 }
 
 void matrix_set(Matrix *m, float val, int row, int col) {
@@ -68,6 +84,17 @@ void matrix_set(Matrix *m, float val, int row, int col) {
     assert(m->n_rows > row && row >= 0);
     assert(m->n_cols > col && col >= 0);
     m->data[row * m->n_cols + col] = val;
+}
+
+void matrix_set_row(Matrix *m, const Vector *src, int row) {
+    assert(m);
+    assert(src);
+    assert(m->n_rows > row && row >= 0);
+    int n = vector_get_n(src);
+    assert(n == m->n_cols);
+    for (int i = 0; i < n; i++) {
+        m->data[row * n + i] = vector_get(src, i);
+    }
 }
 
 void matrix_vec_mul(const Matrix *m, const Vector *v, Vector *res) {

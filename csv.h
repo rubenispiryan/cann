@@ -14,7 +14,7 @@ int csv_get_n_rows(const CSV *csv);
 
 int csv_get_n_cols(const CSV *csv);
 
-void csv_get_row(float *row, int row_size, const CSV *csv, int row_i);
+void csv_row_as_vec(Vector *row, const CSV *csv, int row_i);
 
 void csv_as_matrix(Matrix *m, const CSV *csv);
 

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 // TODO: Currently supports only numeric csv
 // TODO: Does not support commas in a cell
 
@@ -158,6 +159,22 @@ static int parse_header(CSV *csv, FILE *csv_file) {
   return 0;
 }
 
+static char *trim(char *str) {
+  assert(str);
+  while (isspace((unsigned char) *str)) {
+    str++;
+  }
+  if (*str == '\0') {
+    return str;
+  }
+  char *end = str + strlen(str) - 1;
+  while (str < end && isspace((unsigned char) *end)) {
+    end--;
+  }
+  *(end + 1) = '\0';
+  return str;
+}
+
 static int parse_line(CSV *csv, FILE *csv_file) {
   assert(csv_file);
   assert(csv);
@@ -173,9 +190,14 @@ static int parse_line(CSV *csv, FILE *csv_file) {
     }
     ColumnDA *current_col = csv->items[i];
     char *endptr = NULL;
+    cell_value = trim(cell_value);
     float value = strtof(cell_value, &endptr);
     if (*endptr != '\0') {
       free(buffer);
+      #ifndef DEBUG
+        printf("[DEBUG] Could not convert the cell: '%s'\n", cell_value);
+        printf("[DEBUG] (int) *endptr: %d\n", *endptr);
+      #endif
       return 1;
     }
     da_append(current_col, value);
@@ -224,17 +246,6 @@ int csv_get_n_cols(const CSV *csv) {
   return csv->count;
 }
 
-void csv_get_row(float *row, int row_size, const CSV *csv, int row_i) {
-  assert(row);
-  assert(csv);
-  int n_cols = csv->count;
-  assert(row_size == n_cols);
-  assert(csv->n_rows > row_i && row_i >= 0);
-  for (int i = 0; i < n_cols; i++) {
-    row[i] = csv->items[i]->items[row_i];
-  }
-}
-
 void csv_as_matrix(Matrix *m, const CSV *csv) {
   assert(m);
   assert(csv);
@@ -246,6 +257,17 @@ void csv_as_matrix(Matrix *m, const CSV *csv) {
     for (int j = 0; j < n_cols; j++) {
       matrix_set(m, csv->items[j]->items[i], i, j);
     }
+  }
+}
+
+void csv_row_as_vec(Vector *row, const CSV *csv, int row_i) {
+  assert(row);
+  assert(csv);
+  int n_cols = csv->count;
+  assert(vector_get_n(row) == n_cols);
+  assert(csv->n_rows > row_i && row_i >= 0);
+  for (int i = 0; i < n_cols; i++) {
+    vector_set(row, csv->items[i]->items[row_i], i);
   }
 }
 

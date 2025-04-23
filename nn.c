@@ -306,6 +306,44 @@ void net_backpropagation(const Network *net, const Vector *prediciton,
     }
 }
 
+void net_predict_batch(const Network *net, const Matrix *X, Matrix *Y_hat) {
+    assert(net);
+    assert(X);
+    assert(Y_hat);
+    int n = matrix_get_n_rows(X);
+    assert(n == matrix_get_n_rows(Y_hat));
+    Vector *row = create_vector(matrix_get_n_cols(X), true);
+    Vector *pred = create_vector(matrix_get_n_cols(Y_hat), true);
+    for (int i = 0; i < n; i++) {
+        matrix_row_as_vec(row, X, i);
+        net_predict(net, row, pred);
+        matrix_set_row(Y_hat, pred, i);
+    }
+    destroy_vector(row);
+    destroy_vector(pred);
+}
+
+float net_loss_batch(const Network *net, const Matrix *Y_hat, const Matrix *Y) {
+    assert(net);
+    assert(Y_hat);
+    assert(Y);
+    int n = matrix_get_n_rows(Y_hat);
+    assert(n == matrix_get_n_rows(Y));
+    int n_cols = matrix_get_n_cols(Y_hat);
+    assert(n_cols == matrix_get_n_cols(Y));
+    Vector *pred = create_vector(n_cols, true);
+    Vector *target = create_vector(n_cols, true);
+    float total = 0;
+    for (int i = 0; i < n; i++) {
+        matrix_row_as_vec(pred, Y_hat, i);
+        matrix_row_as_vec(target, Y, i);
+        total += net_forward_loss(net, pred, target);
+    }
+    destroy_vector(pred);
+    destroy_vector(target);
+    return total / n;
+}
+
 void net_train(const Network *net, const Matrix *X, const Matrix *Y,
     int epochs) {
     assert(net);
@@ -331,13 +369,13 @@ void net_train(const Network *net, const Matrix *X, const Matrix *Y,
         float total_loss = 0;
         for (int j = 0; j < n; j++) {
             int k = indices[j];
-            const float *inp = matrix_get_row(X, k);
-            const float *targ = matrix_get_row(Y, k);
-            vector_set_data(input, inp, x_cols);
-            vector_set_data(target, targ, y_cols);
+            matrix_row_as_vec(input, X, k);
+            matrix_row_as_vec(target, Y, k);
             net_predict(net, input, output);
             float loss = net_forward_loss(net, output, target);
             #ifdef DEBUG
+                printf("Predicted Vector:\n");
+                vector_print(output);
                 printf("Loss: %.2f\n", loss);
             #endif
             total_loss += loss;
