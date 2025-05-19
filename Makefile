@@ -10,8 +10,5 @@ all: $(OUTPUT)
 $(OUTPUT): $(SOURCES)
 	$(CC) $(CFLAGS) $(SOURCES) -o $(OUTPUT)
 
-sdl: $(SOURCES) mnist.c
-	$(CC) $(CFLAGS) $(SDL_CFLAGS) $(SOURCES) mnist.c -o $(OUTPUT) $(SDL_LDFLAGS)
-
 clean:
 	rm -f $(OUTPUT)
