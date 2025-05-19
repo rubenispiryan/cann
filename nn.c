@@ -227,14 +227,14 @@ void net_set_layer(Network *net, Layer *l, int index) {
 static void layer_apply(Layer *l, const Vector *input) {
     assert(l);
     assert(input);
-    vector_copy_data(l->cache->prev, input);
+    vector_copy(l->cache->prev, input);
     matrix_vec_mul(l->weights, input, l->output);
     vector_add(l->output, l->bias, l->output);
-    vector_copy_data(l->cache->pre_act, l->output);
+    vector_copy(l->cache->pre_act, l->output);
     if (l->act) {
         l->act->forward(l->output);
     }
-    vector_copy_data(l->cache->post_act, l->output);
+    vector_copy(l->cache->post_act, l->output);
 }
 
 void net_predict(const Network *net, const Vector *input, Vector *output) {
@@ -247,7 +247,7 @@ void net_predict(const Network *net, const Vector *input, Vector *output) {
         input = current_layer->output;
     }
     assert(vector_get_n(output) == vector_get_n(input));
-    vector_set_data(output, vector_get_data(input), vector_get_n(input));
+    vector_copy_data(output, vector_get_data(input), vector_get_n(input));
 }
 
 float net_forward_loss(const Network *net, const Vector *prediction,
@@ -314,12 +314,13 @@ void net_predict_batch(const Network *net, const Matrix *X, Matrix *Y_hat) {
     assert(n == matrix_get_n_rows(Y_hat));
     Vector *row = create_vector(matrix_get_n_cols(X), true);
     Vector *pred = create_vector(matrix_get_n_cols(Y_hat), true);
+    vector_free_data(row);
     for (int i = 0; i < n; i++) {
         matrix_row_as_vec(row, X, i);
         net_predict(net, row, pred);
         matrix_set_row(Y_hat, pred, i);
     }
-    destroy_vector(row);
+    free(row);
     destroy_vector(pred);
 }
 
@@ -333,14 +334,16 @@ float net_loss_batch(const Network *net, const Matrix *Y_hat, const Matrix *Y) {
     assert(n_cols == matrix_get_n_cols(Y));
     Vector *pred = create_vector(n_cols, true);
     Vector *target = create_vector(n_cols, true);
+    vector_free_data(pred);
+    vector_free_data(target);
     float total = 0;
     for (int i = 0; i < n; i++) {
         matrix_row_as_vec(pred, Y_hat, i);
         matrix_row_as_vec(target, Y, i);
         total += net_forward_loss(net, pred, target);
     }
-    destroy_vector(pred);
-    destroy_vector(target);
+    free(pred);
+    free(target);
     return total / n;
 }
 
@@ -360,6 +363,8 @@ void net_train(const Network *net, const Matrix *X, const Matrix *Y,
     Vector *input = create_vector(x_cols, true);
     Vector *target = create_vector(y_cols, true);
     Vector *output = create_vector(y_cols, true);
+    vector_free_data(input);
+    vector_free_data(target); 
     for (int i = 0; i < epochs; i++) {
         #ifdef VERBOSE
             printf("--------------\n");
@@ -385,8 +390,8 @@ void net_train(const Network *net, const Matrix *X, const Matrix *Y,
             printf("Avg Loss: %.2f\n", total_loss / n);
         #endif
     }
-    destroy_vector(input);
-    destroy_vector(target);
+    free(input);
+    free(target);
     destroy_vector(output);
     free(indices);
 }

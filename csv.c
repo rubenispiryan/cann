@@ -279,7 +279,7 @@ void csv_col_as_vec(Vector *v, const char *col_name_str, const CSV *csv) {
   int n_cols = csv->count;
   for (int i = 0; i < n_cols; i++) {
     if (strcmp(col_name_str, csv->items[i]->col_name_str) == 0) {
-      vector_set_data(v, csv->items[i]->items, csv->n_rows);
+      vector_copy_data(v, csv->items[i]->items, csv->n_rows);
       return;
     }
   }

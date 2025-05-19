@@ -7,6 +7,7 @@
         "string_view": "c",
         "vector": "c",
         "__bit_reference": "c",
-        "__split_buffer": "c"
+        "__split_buffer": "c",
+        "sstream": "c"
     }
 }

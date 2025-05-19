@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "matrix.h"
+#include "simd_neon.h"
 
 typedef struct matrix {
     float *data;
@@ -19,8 +20,9 @@ Matrix *create_matrix(int n_rows, int n_cols) {
     }
     m->n_cols = n_cols;
     m->n_rows = n_rows;
-    float *data = malloc(sizeof(float) * n_cols * n_rows);
-    if (data == NULL) {
+    float *data = NULL;
+    if (posix_memalign((void **) &data, 16,
+        sizeof(float) * n_cols * n_rows) != 0 || data == NULL) {
         free(m);
         return NULL;
     }
@@ -49,15 +51,14 @@ int matrix_get_n_cols(const Matrix *m) {
     return m->n_cols;
 }
 
+// makes dst->data a pointer to the start of the row of m
 void matrix_row_as_vec(Vector *dst, const Matrix *m, int row_i) {
     assert(m);
     assert(dst);
     assert(m->n_rows > row_i && row_i >= 0);
     int n = vector_get_n(dst);
     assert(n == matrix_get_n_cols(m));
-    for (int i = 0; i < n; i++) {
-        vector_set(dst, m->data[row_i * n + i], i);
-    }
+    vector_set_data(dst, &m->data[row_i * n], n);
 }
 
 void matrix_copy(Matrix *dst_m, const Matrix *src_m) {
@@ -109,18 +110,14 @@ void matrix_vec_mul(const Matrix *m, const Vector *v, Vector *res) {
     assert(vector_get_is_column(res));
 
     const float *data = vector_get_data(v);
-    float *res_data = malloc(sizeof(float) * vector_get_n(res));
-    if (res_data == NULL) {
-        return;
-    }
+    float total = 0;
     for (int i = 0; i < m->n_rows; i++) {
-        float total = 0;
         for (int j = 0; j < m->n_cols; j++) {
             total += m->data[i * m->n_cols + j] * data[j];
         }
-        res_data[i] = total;
+        total = float_dot(&m->data[i * m->n_cols], data, m->n_cols);
+        vector_set(res, total, i);
     }
-    vector_set_data(res, res_data, vector_get_n(res));
 }
 
 void matrix_T_vec_mul(const Matrix *m, const Vector *v, Vector *res) {
@@ -135,18 +132,13 @@ void matrix_T_vec_mul(const Matrix *m, const Vector *v, Vector *res) {
     assert(vector_get_is_column(res));
 
     const float *data = vector_get_data(v);
-    float *res_data = malloc(sizeof(float) * vector_get_n(res));
-    if (res_data == NULL) {
-        return;
-    }
     for (int i = 0; i < m->n_cols; i++) {
         float total = 0;
         for (int j = 0; j < m->n_rows; j++) {
             total += m->data[j * m->n_cols + i] * data[j];
         }
-        res_data[i] = total;
+        vector_set(res, total, i);
     }
-    vector_set_data(res, res_data, vector_get_n(res));
 }
 
 void matrix_outer_mul(Matrix *dst, const Vector *left, const Vector *right) {

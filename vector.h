@@ -9,7 +9,9 @@ Vector *create_vector(int n, bool is_column);
 
 void destroy_vector(Vector *v);
 
-void vector_copy_data(Vector *dst, const Vector *src);
+void vector_free_data(Vector *v);
+
+void vector_copy(Vector *dst, const Vector *src);
 
 int vector_get_n(const Vector *v);
 
@@ -21,7 +23,9 @@ bool vector_get_is_column(const Vector *v);
 
 void vector_transpose(Vector *v);
 
-void vector_set_data(Vector *v, const float *data, int n_elem);
+void vector_copy_data(Vector *v, const float *data, int n_elem);
+
+void vector_set_data(Vector *v, float *data, int n_elem);
 
 void vector_set(Vector *v, float val, int index);
 

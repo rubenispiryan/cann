@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include "vector.h"
+#include "simd_neon.h"
 
 typedef struct vector {
     float *data;
@@ -18,8 +19,9 @@ Vector *create_vector(int n, bool is_column) {
     if (v == NULL) {
         return NULL;
     }
-    float *data = malloc(sizeof(float) * n);
-    if (data == NULL) {
+    float *data = NULL;
+    if (posix_memalign((void **) &data, 16, sizeof(float) * n) != 0 ||
+        data == NULL) {
         free(v);
         return NULL;
     }
@@ -31,11 +33,18 @@ Vector *create_vector(int n, bool is_column) {
 
 void destroy_vector(Vector *v) {
     assert(v);
+    assert(v->data);
     free(v->data);
     free(v);
 }
 
-void vector_copy_data(Vector *dst, const Vector *src) {
+void vector_free_data(Vector *v) {
+    assert(v);
+    assert(v->data);
+    free(v->data);
+}
+
+void vector_copy(Vector *dst, const Vector *src) {
     assert(dst);
     assert(src);
     assert(dst->n == src->n);
@@ -69,11 +78,18 @@ void vector_transpose(Vector *v) {
     v->is_column = !v->is_column;
 }
 
-void vector_set_data(Vector *v, const float *data, int n_elem) {
+void vector_copy_data(Vector *v, const float *data, int n_elem) {
     assert(v);
     assert(data);
-    assert(n_elem <= v->n);
+    assert(n_elem == v->n);
     memcpy(v->data, data, sizeof(float) * n_elem);
+}
+
+void vector_set_data(Vector *v, float *data, int n_elem) {
+    assert(v);
+    assert(data);
+    assert(n_elem == v->n);
+    v->data = data;
 }
 
 void vector_set(Vector *v, float val, int index) {
@@ -111,9 +127,7 @@ void vector_add(const Vector *v1, const Vector *v2, Vector *dst) {
     assert(v1->n == dst->n);
     assert(v1->is_column == v2->is_column);
     assert(v1->is_column == dst->is_column);
-    for (int i = 0; i < v1->n; i++) {
-        dst->data[i] = v1->data[i] + v2->data[i];
-    }
+    float_add(dst->data, v1->data, v2->data, v1->n);
 }
 
 void vector_dot(const Vector *v1, const Vector *v2, Vector *dst) {
@@ -124,9 +138,7 @@ void vector_dot(const Vector *v1, const Vector *v2, Vector *dst) {
     assert(v1->n == dst->n);
     assert(v1->is_column == v2->is_column);
     assert(v1->is_column == dst->is_column);
-    for (int i = 0; i < v1->n; i++) {
-        dst->data[i] = v1->data[i] * v2->data[i];
-    }
+    float_mul(dst->data, v1->data, v2->data, v1->n);
 }
 
 void vector_scaled_sub(Vector *dst, const Vector *v, float scale) {
