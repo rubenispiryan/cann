@@ -1,4 +1,4 @@
-# CANN (C Artificial Neural Network Library)
+# CANN (C Artificial Neural Network)
 
 A lightweight neural network library implemented in pure C, designed for performance and educational purposes. This library provides a foundation for building and training neural networks from scratch without external dependencies.
 
